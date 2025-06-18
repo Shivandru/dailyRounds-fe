@@ -4,32 +4,14 @@ import { MentionsInput, Mention } from "react-mentions";
 import { generalFunction } from "../config/generalFuntions";
 import mentionStyle from "./mentionStyle";
 
-export function TodoForm({}) {
+export function TodoForm({ allUsers, fetchTodos }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [allUsers, setUsers] = useState([]);
   const [mentions, setMentionedIds] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  async function fetchUsers() {
-    setLoading(true);
-    try {
-      const { url } = generalFunction.createUrl("users/allUsers");
-      const res = await fetch(url);
-      const data = await res.json();
-      setUsers(data.users);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.log("error", error);
-    }
-  }
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
   const users = allUsers?.map((u) => ({
     id: u._id,
     display: u.name,
@@ -51,6 +33,7 @@ export function TodoForm({}) {
       setDescription("");
       setPriority("medium");
       setIsExpanded(false);
+      await fetchTodos();
     } catch (error) {
       console.log("error", error);
     }
@@ -163,10 +146,11 @@ export function TodoForm({}) {
           )}
           <button
             type="submit"
-            disabled={loading || !title.trim()}
+            // disabled={loading || !title.trim()}
             className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Adding..." : "Add Todo"}
+            Add Todo
+            {/* {loading ? "Adding..." : "Add Todo"} */}
           </button>
         </div>
       </div>
