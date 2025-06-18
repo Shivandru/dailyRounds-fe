@@ -1,11 +1,21 @@
 import { Filter, Search, SortAsc } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TodoItem } from "./TodoItem";
 
-export function TodoList({ todos, loading, onUpdate, onDelete, allUsers, fetchTodos }) {
+export function TodoList({
+  todos,
+  loading,
+  onUpdate,
+  onDelete,
+  allUsers,
+  fetchTodos,
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("created");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevPage, setPrevPage] = useState(1);
+  const todoPerPage = 10;
 
   const filteredAndSortedTodos = todos
     ?.filter((todo) => {
@@ -35,8 +45,56 @@ export function TodoList({ todos, loading, onUpdate, onDelete, allUsers, fetchTo
       }
     });
 
+  const startIndex = (currentPage - 1) * todoPerPage;
+  const endIndex = startIndex + todoPerPage;
+  const paginatedTodos = filteredAndSortedTodos.slice(startIndex, endIndex);
+  const totalTodos = filteredAndSortedTodos.length;
   const completedCount = todos?.filter((todo) => todo.completed)?.length;
   const totalCount = todos?.length || 0;
+  const totalPages = Math.ceil(totalTodos / todoPerPage);
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const generatePageNumbers = () => {
+    const pageNumbers = [];
+    if (totalPages <= 10) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        pageNumbers.push(1, 2, 3, 4, 5, "...", totalPages);
+      } else if (currentPage > totalPages - 4) {
+        pageNumbers.push(
+          1,
+          "...",
+          totalPages - 4,
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
+      } else {
+        pageNumbers.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+    return pageNumbers;
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filter, sort]);
 
   return (
     <div className="space-y-6">
@@ -130,7 +188,7 @@ export function TodoList({ todos, loading, onUpdate, onDelete, allUsers, fetchTo
             </p>
           </div>
         ) : (
-          filteredAndSortedTodos?.map((todo) => (
+          paginatedTodos?.map((todo) => (
             <TodoItem
               key={todo._id}
               allUsers={allUsers}
@@ -140,6 +198,28 @@ export function TodoList({ todos, loading, onUpdate, onDelete, allUsers, fetchTo
               fetchTodos={fetchTodos}
             />
           ))
+        )}
+      </div>
+      <div className="flex space-x-2">
+        {generatePageNumbers().map((pageNumber, index) =>
+          pageNumber === "..." ? (
+            <span key={index} className="py-2 px-3 text-white/50 select-none">
+              ...
+            </span>
+          ) : (
+            <button
+              key={index}
+              onClick={() => handlePageChange(pageNumber)}
+              className={`flex justify-center items-center w-[38px] h-[36px] px-4 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer
+          ${
+            currentPage === pageNumber
+              ? "bg-purple-500 text-white shadow-md"
+              : "bg-white/10 text-white/70 hover:bg-white/20"
+          }`}
+            >
+              {pageNumber}
+            </button>
+          )
         )}
       </div>
     </div>
