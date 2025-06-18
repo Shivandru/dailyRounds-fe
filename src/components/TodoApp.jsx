@@ -1,18 +1,49 @@
-import { useState } from 'react'
-// import { useAuth } from '../hooks/useAuth'
-// import { useTodos } from '../hooks/useTodos'
-import { AuthForm } from './AuthForm'
-import { Header } from './Headers'
-import { TodoForm } from './TodoForm'
-import { TodoList } from './TodoList'
-import { UsersList } from './UsersList'
+import { useEffect, useState } from "react";
+import { generalFunction } from "../config/generalFuntions";
+import { Header } from "./Headers";
+import { TodoForm } from "./TodoForm";
+import { TodoList } from "./TodoList";
+import { UsersList } from "./UsersList";
 
 export function TodoApp() {
-  // const { user, loading: authLoading } = useAuth()
-  // const { todos, loading: todosLoading, createTodo, updateTodo, deleteTodo } = useTodos(user)
-  const [activeTab, setActiveTab] = useState('todos')
+  const [activeTab, setActiveTab] = useState("todos");
+  const [todos, setTodos] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  function createTodo(){}
+  async function fetchUsers() {
+    try {
+      const { url } = generalFunction.createUrl("users/allUsers");
+      const res = await fetch(url);
+      const data = await res.json();
+      setAllUsers(data.users);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchTodos() {
+    try {
+      const { url } = generalFunction.createUrl("todos/allTodos");
+      const res = await fetch(url,{
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      console.log(data);
+      setTodos(data.todos);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
   // if (authLoading) {
   //   return (
   //     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-blue-600 flex items-center justify-center">
@@ -30,24 +61,20 @@ export function TodoApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-blue-600">
-      <Header 
+      <Header
         activeTab={activeTab}
         onTabChange={setActiveTab}
         // userEmail={user.email}
       />
-      
+
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {activeTab === 'todos' ? (
+        {activeTab === "todos" ? (
           <div className="space-y-8">
-            <TodoForm 
-              onSubmit={createTodo}
-              // loading={todosLoading}
-            />
+            <TodoForm />
             <TodoList
-              // todos={todos}
-              // loading={todosLoading}
-              // onUpdate={updateTodo}
-              // onDelete={deleteTodo}
+              todos={todos}
+              allUsers={allUsers}
+              fetchTodos={fetchTodos}
             />
           </div>
         ) : (
@@ -55,5 +82,5 @@ export function TodoApp() {
         )}
       </main>
     </div>
-  )
+  );
 }

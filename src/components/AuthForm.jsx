@@ -22,6 +22,7 @@ export function AuthForm() {
         const { url } = generalFunction.createUrl("users/login");
         const res = await fetch(url, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -36,6 +37,7 @@ export function AuthForm() {
         const { url } = generalFunction.createUrl("users/register");
         const res = await fetch(url, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

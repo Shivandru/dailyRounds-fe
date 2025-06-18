@@ -1,14 +1,22 @@
 import { CheckSquare, LogOut, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from '../hooks/useAuth'
+import { generalFunction } from "../config/generalFuntions";
 
 export function Header({ activeTab, onTabChange, userEmail }) {
   const navigate = useNavigate();
-  // const { signOut } = useAuth()
 
-  // const handleSignOut = async () => {
-  //   await signOut()
-  // }
+  const handleSignOut = async () => {
+    try {
+      const { url } = generalFunction.createUrl("/users/logout");
+      const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+      });
+      navigate("/");
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   return (
     <header className="backdrop-blur-md bg-white/10 border-b border-white/20 sticky top-0 z-50">
@@ -60,7 +68,7 @@ export function Header({ activeTab, onTabChange, userEmail }) {
               <p className="text-white/60 text-xs">Welcome back!</p>
             </div>
             <button
-              // onClick={handleSignOut}
+              onClick={handleSignOut}
               className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
               title="Sign out"
             >

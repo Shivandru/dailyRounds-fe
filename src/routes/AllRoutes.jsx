@@ -6,14 +6,16 @@ import { TodoList } from "../components/TodoList";
 import { TodoForm } from "../components/TodoForm";
 import { UsersList } from "../components/UsersList";
 import { TodoApp } from "../components/TodoApp";
+import TodoPage from "../pages/TodoPage";
+import UserTodos from "../pages/UserTodos";
 const AllRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthForm />} />
       <Route path="/todo" element={<TodoApp />} />
-      <Route path="/form" element={<TodoForm />} />
-      <Route path="/users" element={<UsersList />} />
+      <Route path="/todo/:todoId" element={<TodoPage />} />
+      <Route path="/user/:userId" element={<UserTodos />} />
     </Routes>
   );
 };

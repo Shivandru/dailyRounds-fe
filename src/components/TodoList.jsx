@@ -2,12 +2,13 @@ import { Filter, Search, SortAsc } from "lucide-react";
 import { useState } from "react";
 import { TodoItem } from "./TodoItem";
 
-export function TodoList({ todos, loading, onUpdate, onDelete }) {
+export function TodoList({ todos, loading, onUpdate, onDelete, allUsers, fetchTodos }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("created");
 
-  const filteredAndSortedTodos = todos?.filter((todo) => {
+  const filteredAndSortedTodos = todos
+    ?.filter((todo) => {
       const matchesSearch =
         todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (todo.description?.toLowerCase().includes(searchTerm.toLowerCase()) ??
@@ -29,12 +30,12 @@ export function TodoList({ todos, loading, onUpdate, onDelete }) {
           return a.title.localeCompare(b.title);
         default:
           return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
       }
     });
 
-  const completedCount = todos?.filter((todo) => todo.completed).length;
+  const completedCount = todos?.filter((todo) => todo.completed)?.length;
   const totalCount = todos?.length || 0;
 
   return (
@@ -92,7 +93,7 @@ export function TodoList({ todos, loading, onUpdate, onDelete }) {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-[#2c2c2c] text-xs font-[600] focus:outline-none focus:ring-2 focus:ring-purple-400/50"
             >
               <option value="all">All</option>
               <option value="pending">Pending</option>
@@ -105,7 +106,7 @@ export function TodoList({ todos, loading, onUpdate, onDelete }) {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-[#2c2c2c] text-xs font-[600] focus:outline-none focus:ring-2 focus:ring-purple-400/50"
             >
               <option value="created">Date Created</option>
               <option value="priority">Priority</option>
@@ -131,10 +132,12 @@ export function TodoList({ todos, loading, onUpdate, onDelete }) {
         ) : (
           filteredAndSortedTodos?.map((todo) => (
             <TodoItem
-              key={todo.id}
+              key={todo._id}
+              allUsers={allUsers}
               todo={todo}
               onUpdate={onUpdate}
               onDelete={onDelete}
+              fetchTodos={fetchTodos}
             />
           ))
         )}

@@ -1,18 +1,24 @@
-import { Clock, Mail, Users } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Mail, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import { generalFunction } from "../config/generalFuntions";
+import Loader from "../ui/Loader";
+import { useNavigate } from "react-router-dom";
 
 export function UsersList() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
 
   async function fetchUsers() {
+    setLoading(true);
     try {
       const { url } = generalFunction.createUrl("users/allUsers");
       const res = await fetch(url);
       const data = await res.json();
       setAllUsers(data.users);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("error", error);
     }
   }
@@ -63,6 +69,7 @@ export function UsersList() {
 
   return (
     <div className="space-y-6">
+      {loading && <Loader />}
       <div className="backdrop-blur-md bg-white/10 rounded-2xl p-6 border border-white/20">
         <div className="flex items-center space-x-3 mb-4">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -72,9 +79,6 @@ export function UsersList() {
             Community Members
           </h2>
         </div>
-        <p className="text-white/70">
-          Connect with other productive people in the TodoVibe community.
-        </p>
       </div>
 
       {loading ? (
@@ -87,7 +91,8 @@ export function UsersList() {
           {allUsers?.map((user) => (
             <div
               key={user._id}
-              className="backdrop-blur-md bg-white/10 rounded-xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:bg-white/15"
+              className="backdrop-blur-md bg-white/10 rounded-xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:bg-white/15 cursor-pointer"
+              onClick={() => navigate(`/user/${user._id}`)}
             >
               <div className="flex items-center space-x-4 mb-4">
                 <div
@@ -115,39 +120,9 @@ export function UsersList() {
                   <span>Member since</span>
                   <span>{new Date(user?.created_at).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center justify-between text-white/70">
-                  <span className="flex items-center space-x-1">
-                    <Clock className="w-3 h-3" />
-                    <span>Last seen</span>
-                  </span>
-                  <span>{getTimeAgo(user?.last_seen)}</span>
-                </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-white/20">
-                <div
-                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                    new Date().getTime() - new Date(user?.last_seen).getTime() <
-                    15 * 60 * 1000
-                      ? "bg-green-500/20 text-green-400"
-                      : "bg-gray-500/20 text-gray-400"
-                  }`}
-                >
-                  <div
-                    className={`w-2 h-2 rounded-full mr-2 ${
-                      new Date().getTime() -
-                        new Date(user?.last_seen).getTime() <
-                      15 * 60 * 1000
-                        ? "bg-green-400"
-                        : "bg-gray-400"
-                    }`}
-                  />
-                  {new Date().getTime() - new Date(user?.last_seen).getTime() <
-                  15 * 60 * 1000
-                    ? "Online"
-                    : "Offline"}
-                </div>
-              </div>
+              <div className="mt-4 pt-4 border-t border-white/20"></div>
             </div>
           ))}
         </div>
