@@ -1,19 +1,27 @@
 import { CheckSquare, LogOut, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { generalFunction } from "../config/generalFuntions";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 export function Header({ activeTab, onTabChange, userEmail }) {
   const navigate = useNavigate();
+  const [loading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     try {
       const { url } = generalFunction.createUrl("/users/logout");
       const res = await fetch(url, {
         method: "GET",
         credentials: "include",
       });
+      setIsLoading(false);
       navigate("/");
+      toast.success("Logged out successfully!");
     } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+      setIsLoading(false);
       console.log("error", error);
     }
   };

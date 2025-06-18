@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { generalFunction } from "../config/generalFuntions";
 import { MentionsInput, Mention } from "react-mentions";
 import mentionStyle from "./mentionStyle";
+import toast from "react-hot-toast";
+import Loader from "../ui/Loader";
 
 export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
   const navigate = useNavigate();
@@ -32,6 +34,7 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
 
   const handleSave = async () => {
     if (!editTitle.trim()) return;
+    setLoading(true);
     try {
       const { url } = generalFunction.createUrl(`todos/update/${todo._id}`);
       const res = await fetch(url, {
@@ -49,7 +52,11 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
       });
       await fetchTodos();
       setIsEditing(false);
+      setLoading(false);
+      toast.success("Todo updated successfully!");
     } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+      setLoading(false);
       console.log("error", error);
     }
   };
@@ -62,6 +69,7 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const { url } = generalFunction.createUrl(`todos/delete/${todo._id}`);
       const res = await fetch(url, {
@@ -69,7 +77,11 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
         credentials: "include",
       });
       await fetchTodos();
+      setLoading(false);
+      toast.success("Todo deleted successfully!");
     } catch (error) {
+      setLoading(false);
+      toast.error("Something went wrong. Please try again.");
       console.log("error", error);
     }
   };
@@ -94,6 +106,7 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
         todo.completed ? "opacity-60" : ""
       }`}
     >
+      {loading && <Loader />}
       {isEditing ? (
         <div className="space-y-3">
           <input
@@ -231,7 +244,7 @@ export function TodoItem({ todo, onUpdate, onDelete, allUsers, fetchTodos }) {
                 e.stopPropagation();
                 handleDelete();
               }}
-              // disabled={loading}
+              disabled={loading}
               className="p-2 text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
               title="Delete todo"
             >

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { MentionsInput, Mention } from "react-mentions";
 import { generalFunction } from "../config/generalFuntions";
 import mentionStyle from "./mentionStyle";
+import toast from "react-hot-toast";
+import Loader from "../ui/Loader";
 
 export function TodoForm({ allUsers, fetchTodos }) {
   const [title, setTitle] = useState("");
@@ -18,6 +20,7 @@ export function TodoForm({ allUsers, fetchTodos }) {
   }));
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!title.trim()) return;
     try {
       const { url } = generalFunction.createUrl("todos/create");
@@ -33,8 +36,12 @@ export function TodoForm({ allUsers, fetchTodos }) {
       setDescription("");
       setPriority("medium");
       setIsExpanded(false);
+      setLoading(false);
       await fetchTodos();
+      toast.success("Todo created successfully!");
     } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+      setLoading(false);
       console.log("error", error);
     }
   };
@@ -56,6 +63,7 @@ export function TodoForm({ allUsers, fetchTodos }) {
       onSubmit={handleSubmit}
       className="backdrop-blur-md bg-white/10 rounded-2xl p-6 border border-white/20 shadow-xl"
     >
+      {loading && <Loader />}
       <div className="flex items-center space-x-3 mb-4">
         <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
           <Plus className="w-5 h-5 text-white" />

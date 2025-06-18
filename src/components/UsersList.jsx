@@ -115,12 +115,12 @@ export function UsersList() {
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm">
+              {/* <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-white/70">
                   <span>Member since</span>
-                  <span>{new Date(user?.created_at).toLocaleDateString()}</span>
+                  <span>{new Date(user?.createdAt).toLocaleDateString()}</span>
                 </div>
-              </div>
+              </div> */}
 
               <div className="mt-4 pt-4 border-t border-white/20"></div>
             </div>
